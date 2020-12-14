@@ -11,9 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
+
+    // interface to be implemented by MainActivity
+    public interface OnLongClickListener{
+        // MainActivity which implements this class needs to know the position
+        // of where the LongClick was performed
+        void OnItemLongClicked(int position);
+    }
+
     List<String> items;
-    public ItemsAdapter(List<String> items){
+    OnLongClickListener longClickListener;
+    public ItemsAdapter(List<String> items, OnLongClickListener longClickListener){
         this.items = items;
+        this.longClickListener = longClickListener;
     }
     /*
         Respsonsible for creating each view
@@ -67,6 +77,18 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
         // Update the view inside of the view holder with this data
         public void bind(String item){
             tvItem.setText(item);
+            tvItem.setOnLongClickListener(new View.OnLongClickListener(){
+                @Override
+                public boolean onLongClick(View v) {
+                    // Remove the item from the recycler view
+                    // Need to communicate that the particular item in the
+                    // RecyclerView was clicked back to the MainActivity
+                    // ie need to pass information from the MainActivity to the ItemsAdapter
+                    // Notify the listener (MainActivity) which position was long pressed
+                    longClickListener.OnItemLongClicked(getAdapterPosition());
+                    return true;
+                }
+            });
         }
     }
 }
