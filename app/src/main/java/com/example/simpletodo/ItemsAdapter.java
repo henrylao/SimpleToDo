@@ -12,18 +12,26 @@ import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
 
+    public interface OnClickListener{
+        // MainActivity
+        void onItemClicked(int position);
+    }
+
     // interface to be implemented by MainActivity
     public interface OnLongClickListener{
         // MainActivity which implements this class needs to know the position
         // of where the LongClick was performed
-        void OnItemLongClicked(int position);
+        void onItemLongClicked(int position);
     }
 
     List<String> items;
     OnLongClickListener longClickListener;
-    public ItemsAdapter(List<String> items, OnLongClickListener longClickListener){
+    OnClickListener clickListener;
+
+    public ItemsAdapter(List<String> items, OnLongClickListener longClickListener, OnClickListener clickListener){
         this.items = items;
         this.longClickListener = longClickListener;
+        this.clickListener = clickListener;
     }
     /*
         Respsonsible for creating each view
@@ -63,10 +71,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
          A RecyclerView.Adapter and ViewHolder for rendering items
         - need to define the view holder
      */
-
     // Container to provide easy access to views that represent each row of the list
     class ViewHolder extends RecyclerView.ViewHolder{
-
         TextView tvItem;
 
         public ViewHolder(@NonNull View itemView) {
@@ -77,6 +83,13 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
         // Update the view inside of the view holder with this data
         public void bind(String item){
             tvItem.setText(item);
+            tvItem.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    clickListener.onItemClicked(getAdapterPosition());
+//                    return true;
+                }
+            });
             tvItem.setOnLongClickListener(new View.OnLongClickListener(){
                 @Override
                 public boolean onLongClick(View v) {
@@ -85,7 +98,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
                     // RecyclerView was clicked back to the MainActivity
                     // ie need to pass information from the MainActivity to the ItemsAdapter
                     // Notify the listener (MainActivity) which position was long pressed
-                    longClickListener.OnItemLongClicked(getAdapterPosition());
+                    longClickListener.onItemLongClicked(getAdapterPosition());
                     return true;
                 }
             });
